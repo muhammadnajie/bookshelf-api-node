@@ -13,7 +13,7 @@ const addBookHandler = (request, h) => {
         readPage, 
         reading,
     } = request.payload;
-    const finished = false;
+    const finished = readPage === pageCount;
     const insertedAt = new Date().toISOString();
     const updatedAt = insertedAt;
 
@@ -66,8 +66,25 @@ const addBookHandler = (request, h) => {
     return response;
 };
 
-const getAllBooksHandler = (_, h) => {
-    const copiedBooks = books.map((book) => ({
+const getAllBooksHandler = (request, h) => {
+    const { name, reading, finished } = request.query; 
+    let filteredBooks = [...books];
+    if (name !== undefined) {
+        // eslint-disable-next-line arrow-body-style
+        filteredBooks = filteredBooks.filter((book) => {
+            return book.name.toLowerCase().includes(name.toLowerCase())
+        });
+    }
+
+    if (reading !== undefined) {
+        filteredBooks = filteredBooks.filter((book) => book.reading == reading);
+    }
+
+    if (finished !== undefined) {
+        filteredBooks = filteredBooks.filter((book) => book.finished == finished);
+    }
+
+    const copiedBooks = filteredBooks.map((book) => ({
         id: book.id,
         name: book.name,
         publisher: book.publisher,
