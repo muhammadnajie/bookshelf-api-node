@@ -14,8 +14,8 @@ const addBookHandler = (request, h) => {
         reading,
     } = request.payload;
     const finished = false;
-    const insertAt = new Date().toISOString();
-    const updatedAt = insertAt;
+    const insertedAt = new Date().toISOString();
+    const updatedAt = insertedAt;
 
     const newBook = {
         id, 
@@ -28,7 +28,7 @@ const addBookHandler = (request, h) => {
         readPage, 
         finished, 
         reading, 
-        insertAt, 
+        insertedAt, 
         updatedAt,
     };
 
@@ -66,6 +66,44 @@ const addBookHandler = (request, h) => {
     return response;
 };
 
+const getAllBooksHandler = (_, h) => {
+    const copiedBooks = books.map((book) => ({
+        id: book.id,
+        name: book.name,
+        publisher: book.publisher,
+    }));
+
+    const response = h.response({
+        status: 'success',
+        data: {
+            books: copiedBooks,
+        },
+    }).code(200);
+    return response;
+};
+
+const getBookByIdHandler = (request, h) => {
+    const { id } = request.params;
+    const book = books.filter((b) => b.id === id)[0];
+
+    if (book !== undefined) {
+        const response = h.response({
+            status: 'success',
+            data: {
+                book,
+            },
+        }).code(200);
+        return response;
+    }
+
+    return h.response({
+        status: 'fail',
+        message: 'Buku tidak ditemukan',
+    }).code(404);
+};
+
 module.exports = {
     addBookHandler,
+    getAllBooksHandler,
+    getBookByIdHandler,
 };
